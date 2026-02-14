@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Préstamo Personal - Inicio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 1em;
+        }
+
+        .card-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-admin:hover {
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.5);
+        }
+
+        .features {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .feature-icon {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            opacity: 0.9;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            transition: border-color 0.3s ease;
+        }
+
+        .footer a:hover {
+            border-bottom-color: white;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>💰 Simulador de Préstamos</h1>
+            <p>Calcula tu préstamo en segundos y recibe atención inmediata</p>
+        </div>
+
+        <div class="cards-container">
+            <!-- Tarjeta Usuario Básico -->
+            <div class="card" onclick="navigateTo('usuarios.html')">
+                <span class="card-badge">Recomendado</span>
+                <span class="card-icon">👤</span>
+                <h2>Usuario Básico</h2>
+                <p>Simula tu préstamo de manera rápida y sencilla</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Cálculo instantáneo</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Múltiples opciones de monto</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Envío directo a WhatsApp</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Interfaz simple y clara</span>
+                    </div>
+                </div>
+                
+                <a href="usuarios.html" class="btn" onclick="event.stopPropagation()">
+                    Iniciar Simulación
+                </a>
+            </div>
+
+            <!-- Tarjeta Usuario Avanzado -->
+            <div class="card" onclick="navigateTo('usuarios.html?avanzado')">
+                <span class="card-badge">Completo</span>
+                <span class="card-icon">🎯</span>
+                <h2>Usuario Avanzado</h2>
+                <p>Información detallada con todas las opciones</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Todo lo del modo básico</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>CAT aproximado</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Tabla de pagos detallada</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Historial de simulaciones</span>
+                    </div>
+                </div>
+                
+                <a href="usuarios.html?avanzado" class="btn" onclick="event.stopPropagation()">
+                    Ver Detalles
+                </a>
+            </div>
+
+            <!-- Tarjeta Admin -->
+            <div class="card" onclick="navigateTo('admin.html')">
+                <span class="card-badge">Administrador</span>
+                <span class="card-icon">🔧</span>
+                <h2>Panel Admin</h2>
+                <p>Gestión y configuración del simulador</p>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Ver configuración actual</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Refrescar datos</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Limpiar caché</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Estadísticas del sistema</span>
+                    </div>
+                </div>
+                
+                <a href="admin.html" class="btn btn-admin" onclick="event.stopPropagation()">
+                    Acceder al Panel
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Proyecto @PsolarMexico</strong></p>
+            <p>León de los Aldama, Guanajuato, México</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                ¿Necesitas ayuda? 
+                <a href="https://wa.me/524771234567" target="_blank">Contáctanos por WhatsApp</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Ocultar loading overlay cuando cargue la página
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingOverlay').classList.add('hide');
+            }, 500);
+        });
+
+        // Función de navegación con animación
+        function navigateTo(url) {
+            // Mostrar loading
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hide');
+            
+            // Navegar después de la animación
+            setTimeout(function() {
+                window.location.href = url;
+            }, 300);
+        }
+
+        // Detectar si hay parámetros en la URL para redirigir automáticamente
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('mode')) {
+            const mode = urlParams.get('mode');
+            if (mode === 'basico') {
+                navigateTo('usuarios.html');
+            } else if (mode === 'avanzado') {
+                navigateTo('usuarios.html?avanzado');
+            } else if (mode === 'admin') {
+                navigateTo('admin.html');
+            }
+        }
+
+        // Verificar si localStorage tiene datos y mostrar indicador
+        window.addEventListener('DOMContentLoaded', function() {
+            const cachedData = localStorage.getItem('simuladorData');
+            if (cachedData) {
+                const data = JSON.parse(cachedData);
+                const cacheDate = new Date(data.timestamp);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - cacheDate) / 1000 / 60);
+                
+                if (diffMinutes < 30) {
+                    console.log(`✅ Datos en caché (${diffMinutes} minutos de antigüedad)`);
+                } else {
+                    console.log('⚠️ Caché expirado - se actualizará al entrar');
+                }
+            } else {
+                console.log('📝 Primera visita - se descargarán datos');
+            }
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            // 1 = Usuario básico
+            if (e.key === '1') {
+                navigateTo('usuarios.html');
+            }
+            // 2 = Usuario avanzado
+            if (e.key === '2') {
+                navigateTo('usuarios.html?avanzado');
+            }
+            // A = Admin
+            if (e.key === 'a' || e.key === 'A') {
+                navigateTo('admin.html');
+            }
+        });
+
+        // Mostrar tooltip de atajos
+        console.log(`
+        🎮 Atajos de teclado disponibles:
+        -----------------------------------
+        Presiona '1' → Usuario Básico
+        Presiona '2' → Usuario Avanzado
+        Presiona 'A' → Panel Admin
+        `);
+    </script>
+</body>
+</html>
