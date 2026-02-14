@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Simulador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #0c5460;
+        }
+
+        .alert-info strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .tools-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tools-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .config-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .config-value {
+            color: #333;
+            font-size: 1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-online {
+            background: #27ae60;
+        }
+
+        .status-offline {
+            background: #e74c3c;
+        }
+
+        .banner-preview {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cache-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Panel de Administración</h1>
+            <p>Simulador de Préstamo Personal - @PsolarMexico</p>
+            <div style="margin-top: 15px;">
+                <span class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Verificando conexión...</span>
+                </span>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Cargando configuración...</p>
+        </div>
+
+        <div id="adminPanel" style="display: none;">
+            <div class="alert-info">
+                <strong>📝 Instrucciones:</strong>
+                Edita directamente en Google Sheets para cambiar cualquier valor (tasas, montos, plazos, textos, etc.). 
+                No necesitas tocar el código HTML. Los cambios se reflejarán automáticamente en la aplicación.
+            </div>
+
+            <!-- Herramientas -->
+            <div class="tools-section">
+                <h2>🛠️ Herramientas de Mantenimiento</h2>
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="refreshData()">
+                        🔄 Refrescar datos desde Sheets
+                    </button>
+                    <button class="btn btn-danger" onclick="clearCache()">
+                        🗑️ Limpiar caché del navegador
+                    </button>
+                    <button class="btn btn-primary" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID, '_blank')">
+                        📊 Abrir Google Sheets
+                    </button>
+                </div>
+                <div id="cacheInfo" class="cache-info" style="display: none;">
+                    <strong>📅 Caché actual:</strong> <span id="cacheDate"></span>
+                </div>
+            </div>
+
+            <!-- Configuración General -->
+            <div class="section">
+                <h3>⚙️ Configuración General</h3>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <div class="config-label">Título de la aplicación</div>
+                        <div class="config-value" id="cfgTitulo">-</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Número de WhatsApp</div>
+                        <div class="config-value" id="cfgWhatsApp">-</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-label">Banner URL</div>
+                        <div class="config-value" id="cfgBanner" style="word-break: break-all;">-</div>
+                    </div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Descripción</div>
+                    <div class="config-value" id="cfgDescripcion" style="white-space: pre-line;">-</div>
+                </div>
+                <div id="bannerPreviewContainer" style="display: none; margin-top: 20px;">
+                    <div class="config-label">Vista previa del banner:</div>
+                    <img id="bannerPreview" class="banner-preview" src="" alt="Banner">
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="section">
+                <h3>📊 Estadísticas</h3>
+                <div class="config-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="statCapital">0</div>
+                        <div class="stat-label">Opciones de Capital</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statPlazo">0</div>
+                        <div class="stat-label">Opciones de Plazo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statRangos">0</div>
+                        <div class="stat-label">Rangos de Interés</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opciones de Capital -->
+            <div class="section">
+                <h3>💰 Opciones de Capital Configuradas</h3>
+                <table id="tableCapital">
+                    <thead>
+                        <tr>
+                            <th>Monto</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Opciones de Plazo -->
+            <div class="section">
+                <h3>📅 Opciones de Plazo Configuradas</h3>
+                <table id="tablePlazo">
+                    <thead>
+                        <tr>
+                            <th>Días</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Rangos de Interés -->
+            <div class="section">
+                <h3>📈 Rangos de Interés Configurados</h3>
+                <table id="tableRangos">
+                    <thead>
+                        <tr>
+                            <th>Días Mínimos</th>
+                            <th>Días Máximos</th>
+                            <th>Tasa Anual (%)</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Textos Configurados -->
+            <div class="section">
+                <h3>📝 Textos Personalizados</h3>
+                <table id="tableTextos">
+                    <thead>
+                        <tr>
+                            <th>Clave</th>
+                            <th>Texto</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Enlaces rápidos -->
+            <div class="section">
+                <h3>🔗 Enlaces Rápidos</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="window.open('usuarios.html', '_blank')">
+                        👤 Ver versión Usuario Básico
+                    </button>
+                    <button class="btn btn-primary" onclick="window.open('usuarios.html?avanzado', '_blank')">
+                        🎯 Ver versión Usuario Avanzado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración (reemplaza con tus valores)
+        const SPREADSHEET_ID = 'TU_SPREADSHEET_ID_AQUI';
+        const API_KEY = 'TU_API_KEY_AQUI';
+
+        let configData = null;
+        let isOnline = true;
+
+        // Función para formatear moneda
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN'
+            }).format(amount);
+        }
+
+        // Función para obtener datos de Google Sheets
+        async function fetchSheetData(sheetName) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}?key=${API_KEY}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Error fetching ${sheetName}`);
+            const data = await response.json();
+            return data.values || [];
+        }
+
+        // Cargar todos los datos
+        async function loadAllData() {
+            try {
+                const [configGeneral, opcionesCapital, opcionesPlazo, rangosInteres, textosUsuario, textosAdmin] = await Promise.all([
+                    fetchSheetData('ConfigGeneral'),
+                    fetchSheetData('OpcionesCapital'),
+                    fetchSheetData('OpcionesPlazo'),
+                    fetchSheetData('RangosInteres'),
+                    fetchSheetData('TextosUsuario'),
+                    fetchSheetData('TextosAdmin')
+                ]);
+
+                const data = {
+                    config: parseConfig(configGeneral),
+                    capital: parseOptions(opcionesCapital),
+                    plazo: parseOptions(opcionesPlazo),
+                    rangos: parseRangos(rangosInteres),
+                    textosUsuario: parseTextos(textosUsuario),
+                    textosAdmin: parseTextos(textosAdmin),
+                    timestamp: Date.now()
+                };
+
+                // Guardar en localStorage
+                localStorage.setItem('simuladorData', JSON.stringify(data));
+                isOnline = true;
+                updateStatus(true);
+                return data;
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                // Intentar cargar desde caché
+                const cached = localStorage.getItem('simuladorData');
+                if (cached) {
+                    isOnline = false;
+                    updateStatus(false);
+                    return JSON.parse(cached);
+                }
+                throw error;
+            }
+        }
+
+        // Parsear configuración
+        function parseConfig(rows) {
+            const config = {};
+            rows.slice(1).forEach(row => {
+                if (row[0]) config[row[0]] = row[1] || '';
+            });
+            return config;
+        }
+
+        // Parsear opciones
+        function parseOptions(rows) {
+            return rows.slice(1).map(row => ({
+                value: parseFloat(row[0]) || 0,
+                description: row[1] || ''
+            }));
+        }
+
+        // Parsear rangos
+        function parseRangos(rows) {
+            return rows.slice(1).map(row => ({
+                min: parseInt(row[0]) || 0,
+                max: parseInt(row[1]) || 999999,
+                tasa: parseFloat(row[2]) || 0
+            }));
+        }
+
+        // Parsear textos
+        function parseTextos(rows) {
+            const textos = {};
+            rows.slice(1).forEach(row => {
+                if (row[0]) textos[row[0]] = row[1] || '';
+            });
+            return textos;
+        }
+
+        // Actualizar estado de conexión
+        function updateStatus(online) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            if (online) {
+                statusDot.className = 'status-dot status-online';
+                statusText.textContent = 'Conectado a Google Sheets';
+            } else {
+                statusDot.className = 'status-dot status-offline';
+                statusText.textContent = 'Usando datos en caché (offline)';
+            }
+        }
+
+        // Renderizar panel de administración
+        function renderAdminPanel() {
+            // Configuración general
+            document.getElementById('cfgTitulo').textContent = configData.config.titulo || '-';
+            document.getElementById('cfgWhatsApp').textContent = configData.config.numero_whatsapp || '-';
+            document.getElementById('cfgBanner').textContent = configData.config.banner || '-';
+            document.getElementById('cfgDescripcion').textContent = configData.config.descripcion || '-';
+
+            // Vista previa del banner
+            if (configData.config.banner) {
+                document.getElementById('bannerPreviewContainer').style.display = 'block';
+                document.getElementById('bannerPreview').src = configData.config.banner;
+            }
+
+            // Estadísticas
+            document.getElementById('statCapital').textContent = configData.capital.length;
+            document.getElementById('statPlazo').textContent = configData.plazo.length;
+            document.getElementById('statRangos').textContent = configData.rangos.length;
+
+            // Tabla de capital
+            const tbodyCapital = document.querySelector('#tableCapital tbody');
+            tbodyCapital.innerHTML = '';
+            configData.capital.forEach(item => {
+                const row = tbodyCapital.insertRow();
+                row.insertCell(0).textContent = formatCurrency(item.value);
+                row.insertCell(1).textContent = item.description;
+            });
+
+            // Tabla de plazos
+            const tbodyPlazo = document.querySelector('#tablePlazo tbody');
+            tbodyPlazo.innerHTML = '';
+            configData.plazo.forEach(item => {
+                const row = tbodyPlazo.insertRow();
+                row.insertCell(0).textContent = item.value;
+                row.insertCell(1).textContent = item.description;
+            });
+
+            // Tabla de rangos
+            const tbodyRangos = document.querySelector('#tableRangos tbody');
+            tbodyRangos.innerHTML = '';
+            configData.rangos.forEach(item => {
+                const row = tbodyRangos.insertRow();
+                row.insertCell(0).textContent = item.min;
+                row.insertCell(1).textContent = item.max;
+                row.insertCell(2).textContent = `${item.tasa}%`;
+                const statusCell = row.insertCell(3);
+                statusCell.innerHTML = '<span class="badge badge-success">Activo</span>';
+            });
+
+            // Tabla de textos
+            const tbodyTextos = document.querySelector('#tableTextos tbody');
+            tbodyTextos.innerHTML = '';
+            const allTextos = { ...configData.textosUsuario, ...configData.textosAdmin };
+            Object.entries(allTextos).forEach(([key, value]) => {
+                const row = tbodyTextos.insertRow();
+                row.insertCell(0).textContent = key;
+                row.insertCell(1).textContent = value;
+            });
+
+            // Info de caché
+            if (configData.timestamp) {
+                document.getElementById('cacheInfo').style.display = 'block';
+                const date = new Date(configData.timestamp);
+                document.getElementById('cacheDate').textContent = date.toLocaleString('es-MX');
+            }
+        }
+
+        // Refrescar datos
+        async function refreshData() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Cargando...';
+            btn.disabled = true;
+
+            try {
+                configData = await loadAllData();
+                renderAdminPanel();
+                alert('✅ Datos actualizados correctamente desde Google Sheets');
+            } catch (error) {
+                alert('❌ Error al actualizar: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Limpiar caché
+        function clearCache() {
+            if (confirm('¿Estás seguro de que deseas limpiar el caché? Esto eliminará todos los datos guardados localmente.')) {
+                localStorage.removeItem('simuladorData');
+                localStorage.removeItem('lastSimulation');
+                alert('✅ Caché limpiado. Se recargará la página para obtener datos frescos.');
+                location.reload();
+            }
+        }
+
+        // Inicializar
+        async function init() {
+            try {
+                configData = await loadAllData();
+                renderAdminPanel();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <p style="color: #e74c3c; font-weight: bold;">❌ Error al cargar configuración</p>
+                    <p style="margin-top: 15px;">Detalles: ${error.message}</p>
+                    <p style="margin-top: 15px; font-size: 0.9em;">
+                        Verifica que:
+                        <ul style="text-align: left; margin: 15px auto; max-width: 400px;">
+                            <li>El SPREADSHEET_ID esté configurado correctamente</li>
+                            <li>La API_KEY sea válida y tenga acceso a Google Sheets API</li>
+                            <li>La hoja de cálculo sea pública (lectura para cualquiera con el enlace)</li>
+                            <li>Las pestañas tengan los nombres exactos especificados</li>
+                        </ul>
+                    </p>
+                `;
+            }
+        }
+
+        // Iniciar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
