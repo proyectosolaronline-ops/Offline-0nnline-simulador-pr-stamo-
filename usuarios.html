@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Préstamo Personal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .banner {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+
+        .offline-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #856404;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .popup {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .popup h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .popup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .popup-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .popup-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .popup-value {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        /* Sección avanzada */
+        .advanced-section {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .advanced-section.show {
+            display: block;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .payment-table th,
+        .payment-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .payment-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .payment-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .legal-notice {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cat-display {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .cat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-field {
+            margin-bottom: 20px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-field input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .modal-legend {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .btn-send {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-send:hover {
+            background: #764ba2;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .popup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Cargando simulador...</p>
+        </div>
+
+        <div id="app" style="display: none;">
+            <img id="banner" class="banner" src="" alt="Banner" style="display: none;">
+            
+            <div class="content">
+                <div id="offlineNotice" class="offline-notice">
+                    <strong>⚠️ Modo Offline</strong><br>
+                    Usando datos guardados del <span id="cacheDate"></span>
+                </div>
+
+                <h1 id="titulo">Simulador de Préstamo Personal</h1>
+                <p class="description" id="descripcion"></p>
+
+                <div class="form-group">
+                    <label for="capital">Monto del préstamo:</label>
+                    <select id="capital">
+                        <option value="">Selecciona un monto...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="plazo">Plazo del préstamo:</label>
+                    <select id="plazo">
+                        <option value="">Selecciona un plazo...</option>
+                    </select>
+                </div>
+
+                <div id="resultPopup" class="popup" style="display: none;">
+                    <h3 id="popupTitulo">Cálculo actualizado</h3>
+                    <div class="popup-grid">
+                        <div class="popup-item">
+                            <div class="popup-label">Capital solicitado</div>
+                            <div class="popup-value" id="resCapital">$0</div>
+                        </div>
+                        <div class="popup-item">
+                            <div class="popup-label">Plazo</div>
+                            <div class="popup-value" id="resPlazo">0 días</div>
+                        </div>
+                        <div class="popup-item">
+                            <div class="popup-label">Tasa anual</div>
+                            <div class="popup-value" id="resTasa">0%</div>
+                        </div>
+                        <div class="popup-item">
+                            <div class="popup-label">Interés total</div>
+                            <div class="popup-value" id="resInteres">$0</div>
+                        </div>
+                        <div class="popup-item">
+                            <div class="popup-label">Total a pagar</div>
+                            <div class="popup-value" id="resTotalPagar">$0</div>
+                        </div>
+                        <div class="popup-item">
+                            <div class="popup-label">Pago diario aprox.</div>
+                            <div class="popup-value" id="resPagoDiario">$0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Avanzada -->
+                <div id="advancedSection" class="advanced-section">
+                    <h3>Información Detallada</h3>
+                    
+                    <div class="cat-display">
+                        <div style="font-size: 0.9em; margin-bottom: 5px;">CAT Aproximado</div>
+                        <div class="cat-value" id="catValue">0%</div>
+                        <div style="font-size: 0.8em; margin-top: 5px; color: #856404;">Sin IVA</div>
+                    </div>
+
+                    <h4 style="margin-top: 25px; margin-bottom: 15px;">Tabla de Pagos</h4>
+                    <table class="payment-table">
+                        <thead>
+                            <tr>
+                                <th>Frecuencia</th>
+                                <th>Cantidad de pagos</th>
+                                <th>Monto por pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Diario</td>
+                                <td id="pagosDiarios">0</td>
+                                <td id="montoDiario">$0</td>
+                            </tr>
+                            <tr>
+                                <td>Semanal</td>
+                                <td id="pagosSemana">0</td>
+                                <td id="montoSemanal">$0</td>
+                            </tr>
+                            <tr>
+                                <td>Mensual</td>
+                                <td id="pagosMensual">0</td>
+                                <td id="montoMensual">$0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="history-section">
+                        <h4>Última simulación guardada</h4>
+                        <div id="historyContent">No hay simulaciones previas</div>
+                    </div>
+
+                    <div class="legal-notice">
+                        <strong>Aviso Legal:</strong> Las tasas están sujetas a aprobación crediticia. 
+                        El CAT mostrado es aproximado y puede variar según tu perfil. 
+                        Consulta términos y condiciones completos antes de solicitar.
+                    </div>
+                </div>
+
+                <button class="btn-whatsapp" id="btnWhatsApp">
+                    📱 Solicitar por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de formulario -->
+    <div id="whatsappModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Enviar solicitud</h2>
+            </div>
+
+            <div class="modal-legend" id="modalLeyenda">
+                Nombre y teléfono son obligatorios. Los demás datos ayudan a agilizar tu trámite.
+            </div>
+
+            <div class="form-field">
+                <label>Nombre completo <span class="required">*</span></label>
+                <input type="text" id="inputNombre" placeholder="Tu nombre completo" required>
+            </div>
+
+            <div class="form-field">
+                <label>Teléfono <span class="required">*</span></label>
+                <input type="tel" id="inputTelefono" placeholder="10 dígitos" required>
+            </div>
+
+            <div class="form-field">
+                <label>Correo electrónico</label>
+                <input type="email" id="inputCorreo" placeholder="tu@email.com">
+            </div>
+
+            <div class="form-field">
+                <label>Ubicación / Ciudad</label>
+                <input type="text" id="inputUbicacion" placeholder="Ciudad, Estado">
+            </div>
+
+            <button class="btn-send" id="btnEnviar">Enviar por WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración
+        const SPREADSHEET_ID = 'TU_SPREADSHEET_ID_AQUI'; // Reemplaza con tu ID
+        const API_KEY = 'TU_API_KEY_AQUI'; // Reemplaza con tu API Key
+        const CACHE_DURATION = 30 * 60 * 1000; // 30 minutos en milisegundos
+
+        // Variables globales
+        let configData = null;
+        let isAdvancedMode = false;
+        let currentCalculation = null;
+
+        // Detectar modo avanzado
+        const urlParams = new URLSearchParams(window.location.search);
+        isAdvancedMode = urlParams.has('avanzado');
+
+        // Función para formatear moneda
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN'
+            }).format(amount);
+        }
+
+        // Función para obtener datos de Google Sheets
+        async function fetchSheetData(sheetName) {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${sheetName}?key=${API_KEY}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Error fetching ${sheetName}`);
+            const data = await response.json();
+            return data.values || [];
+        }
+
+        // Función para cargar todas las configuraciones
+        async function loadAllData() {
+            try {
+                const [configGeneral, opcionesCapital, opcionesPlazo, rangosInteres, textosUsuario] = await Promise.all([
+                    fetchSheetData('ConfigGeneral'),
+                    fetchSheetData('OpcionesCapital'),
+                    fetchSheetData('OpcionesPlazo'),
+                    fetchSheetData('RangosInteres'),
+                    fetchSheetData('TextosUsuario')
+                ]);
+
+                const data = {
+                    config: parseConfig(configGeneral),
+                    capital: parseOptions(opcionesCapital),
+                    plazo: parseOptions(opcionesPlazo),
+                    rangos: parseRangos(rangosInteres),
+                    textos: parseTextos(textosUsuario),
+                    timestamp: Date.now()
+                };
+
+                // Guardar en localStorage
+                localStorage.setItem('simuladorData', JSON.stringify(data));
+                return data;
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                // Intentar cargar desde caché
+                const cached = localStorage.getItem('simuladorData');
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    showOfflineNotice(data.timestamp);
+                    return data;
+                }
+                throw error;
+            }
+        }
+
+        // Parsear configuración general
+        function parseConfig(rows) {
+            const config = {};
+            rows.slice(1).forEach(row => {
+                if (row[0]) {
+                    config[row[0]] = row[1] || '';
+                }
+            });
+            return config;
+        }
+
+        // Parsear opciones (capital/plazo)
+        function parseOptions(rows) {
+            return rows.slice(1).map(row => ({
+                value: parseFloat(row[0]) || 0,
+                description: row[1] || ''
+            }));
+        }
+
+        // Parsear rangos de interés
+        function parseRangos(rows) {
+            return rows.slice(1).map(row => ({
+                min: parseInt(row[0]) || 0,
+                max: parseInt(row[1]) || 999999,
+                tasa: parseFloat(row[2]) || 0
+            }));
+        }
+
+        // Parsear textos
+        function parseTextos(rows) {
+            const textos = {};
+            rows.slice(1).forEach(row => {
+                if (row[0]) {
+                    textos[row[0]] = row[1] || '';
+                }
+            });
+            return textos;
+        }
+
+        // Mostrar aviso offline
+        function showOfflineNotice(timestamp) {
+            const notice = document.getElementById('offlineNotice');
+            const dateSpan = document.getElementById('cacheDate');
+            const date = new Date(timestamp);
+            dateSpan.textContent = date.toLocaleString('es-MX');
+            notice.style.display = 'block';
+        }
+
+        // Renderizar UI
+        function renderUI() {
+            // Banner
+            if (configData.config.banner) {
+                const banner = document.getElementById('banner');
+                banner.src = configData.config.banner;
+                banner.style.display = 'block';
+            }
+
+            // Título y descripción
+            document.getElementById('titulo').textContent = configData.config.titulo || 'Simulador de Préstamo';
+            document.getElementById('descripcion').textContent = configData.config.descripcion || '';
+
+            // Opciones de capital
+            const capitalSelect = document.getElementById('capital');
+            configData.capital.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.description;
+                capitalSelect.appendChild(option);
+            });
+
+            // Opciones de plazo
+            const plazoSelect = document.getElementById('plazo');
+            configData.plazo.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.description;
+                plazoSelect.appendChild(option);
+            });
+
+            // Textos personalizados
+            if (configData.textos.popup_titulo) {
+                document.getElementById('popupTitulo').textContent = configData.textos.popup_titulo;
+            }
+            if (configData.textos.leyenda_modal) {
+                document.getElementById('modalLeyenda').textContent = configData.textos.leyenda_modal;
+            }
+
+            // Mostrar sección avanzada si corresponde
+            if (isAdvancedMode) {
+                document.getElementById('advancedSection').classList.add('show');
+            }
+        }
+
+        // Calcular préstamo
+        function calcularPrestamo() {
+            const capital = parseFloat(document.getElementById('capital').value);
+            const dias = parseFloat(document.getElementById('plazo').value);
+
+            if (!capital || !dias) return;
+
+            // Buscar tasa según rango
+            const rango = configData.rangos.find(r => dias >= r.min && dias <= r.max);
+            const tasaAnual = rango ? rango.tasa : 2.5; // Tasa por defecto
+
+            // Cálculos
+            const tasaDiaria = tasaAnual / 100 / 365;
+            const interes = capital * tasaDiaria * dias;
+            const totalPagar = capital + interes;
+            const pagoDiario = totalPagar / dias;
+
+            currentCalculation = {
+                capital,
+                dias,
+                tasaAnual,
+                interes,
+                totalPagar,
+                pagoDiario
+            };
+
+            // Mostrar resultados
+            document.getElementById('resCapital').textContent = formatCurrency(capital);
+            document.getElementById('resPlazo').textContent = `${dias} días`;
+            document.getElementById('resTasa').textContent = `${tasaAnual}%`;
+            document.getElementById('resInteres').textContent = formatCurrency(interes);
+            document.getElementById('resTotalPagar').textContent = formatCurrency(totalPagar);
+            document.getElementById('resPagoDiario').textContent = formatCurrency(pagoDiario);
+            document.getElementById('resultPopup').style.display = 'block';
+
+            // Cálculos avanzados
+            if (isAdvancedMode) {
+                updateAdvancedCalculations();
+            }
+
+            // Guardar en historial
+            saveToHistory();
+        }
+
+        // Actualizar cálculos avanzados
+        function updateAdvancedCalculations() {
+            const { capital, dias, tasaAnual, interes, totalPagar, pagoDiario } = currentCalculation;
+
+            // CAT aproximado (simplificado)
+            const cat = tasaAnual * 1.16; // Aproximación simple
+            document.getElementById('catValue').textContent = `${cat.toFixed(2)}%`;
+
+            // Tabla de pagos
+            document.getElementById('pagosDiarios').textContent = dias;
+            document.getElementById('montoDiario').textContent = formatCurrency(pagoDiario);
+
+            const semanas = Math.ceil(dias / 7);
+            const pagoSemanal = totalPagar / semanas;
+            document.getElementById('pagosSemana').textContent = semanas;
+            document.getElementById('montoSemanal').textContent = formatCurrency(pagoSemanal);
+
+            const meses = Math.ceil(dias / 30);
+            const pagoMensual = totalPagar / meses;
+            document.getElementById('pagosMensual').textContent = meses;
+            document.getElementById('montoMensual').textContent = formatCurrency(pagoMensual);
+        }
+
+        // Guardar en historial
+        function saveToHistory() {
+            if (!isAdvancedMode) return;
+
+            const history = {
+                ...currentCalculation,
+                fecha: new Date().toLocaleString('es-MX')
+            };
+
+            localStorage.setItem('lastSimulation', JSON.stringify(history));
+            displayHistory();
+        }
+
+        // Mostrar historial
+        function displayHistory() {
+            const historyStr = localStorage.getItem('lastSimulation');
+            if (!historyStr) return;
+
+            const history = JSON.parse(historyStr);
+            const content = `
+                <p><strong>Fecha:</strong> ${history.fecha}</p>
+                <p><strong>Capital:</strong> ${formatCurrency(history.capital)}</p>
+                <p><strong>Plazo:</strong> ${history.dias} días</p>
+                <p><strong>Total a pagar:</strong> ${formatCurrency(history.totalPagar)}</p>
+            `;
+            document.getElementById('historyContent').innerHTML = content;
+        }
+
+        // Modal de WhatsApp
+        const modal = document.getElementById('whatsappModal');
+        const btnWhatsApp = document.getElementById('btnWhatsApp');
+        const closeModal = document.querySelector('.close');
+
+        btnWhatsApp.onclick = function() {
+            if (!currentCalculation) {
+                alert('Por favor, selecciona un monto y plazo primero');
+                return;
+            }
+            modal.classList.add('show');
+        };
+
+        closeModal.onclick = function() {
+            modal.classList.remove('show');
+        };
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.classList.remove('show');
+            }
+        };
+
+        // Enviar por WhatsApp
+        document.getElementById('btnEnviar').onclick = function() {
+            const nombre = document.getElementById('inputNombre').value.trim();
+            const telefono = document.getElementById('inputTelefono').value.trim();
+            const correo = document.getElementById('inputCorreo').value.trim();
+            const ubicacion = document.getElementById('inputUbicacion').value.trim();
+
+            if (!nombre || !telefono) {
+                alert('Nombre y teléfono son obligatorios');
+                return;
+            }
+
+            const { capital, dias, tasaAnual, totalPagar } = currentCalculation;
+            const numeroWhatsApp = configData.config.numero_whatsapp || '5214771234567';
+
+            let mensaje = `¡Hola! 👋 Me interesa solicitar un préstamo:\n\n`;
+            mensaje += `📋 *Datos de la simulación:*\n`;
+            mensaje += `💰 Capital: ${formatCurrency(capital)}\n`;
+            mensaje += `📅 Plazo: ${dias} días\n`;
+            mensaje += `📊 Tasa: ${tasaAnual}%\n`;
+            mensaje += `💵 Total a pagar: ${formatCurrency(totalPagar)}\n\n`;
+            mensaje += `👤 *Mis datos:*\n`;
+            mensaje += `Nombre: ${nombre}\n`;
+            mensaje += `Teléfono: ${telefono}\n`;
+            if (correo) mensaje += `Correo: ${correo}\n`;
+            if (ubicacion) mensaje += `Ubicación: ${ubicacion}\n`;
+
+            const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            modal.classList.remove('show');
+        };
+
+        // Event listeners
+        document.getElementById('capital').addEventListener('change', calcularPrestamo);
+        document.getElementById('plazo').addEventListener('change', calcularPrestamo);
+
+        // Inicializar app
+        async function init() {
+            try {
+                configData = await loadAllData();
+                renderUI();
+                if (isAdvancedMode) {
+                    displayHistory();
+                }
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <p style="color: #e74c3c;">❌ Error al cargar el simulador</p>
+                    <p style="font-size: 0.9em;">Por favor, verifica tu conexión y recarga la página</p>
+                `;
+            }
+        }
+
+        // Iniciar cuando cargue el DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
+ 
